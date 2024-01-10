@@ -11,7 +11,5 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
     command: webserver
     image: my_airflow_image:latest
