@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  check_dependencies:
+    build:
+      context: .
+    command: /bin/bash -c "airflow db check"
+    depends_on:
+      - my_airflow_service
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/opt/airflow/dags
+    networks:
+      - docker_airflow_basic_default
+    working_dir: /opt/airflow
