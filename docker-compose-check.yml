@@ -1,5 +1,9 @@
 version: '3'
 
+networks:
+  docker_airflow_basic_default:
+    external: true
+
 services:
   check_dependencies:
     build:
