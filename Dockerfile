@@ -12,4 +12,4 @@ USER root
 USER airflow
 
 # Copy the DAG file into the container
-COPY my_dag.py /opt/airflow/dags/my_dag.py
+COPY dags/my_dag.py /opt/airflow/dags/my_dag.py
