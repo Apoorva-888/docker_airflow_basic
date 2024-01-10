@@ -1,9 +1,10 @@
 version: '3'
 
 services:
-  airflow:
+  my_airflow_service:
     build:
       context: .
+    container_name: my_airflow_container
     ports:
       - "8080:8080"
     environment:
@@ -13,3 +14,4 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
     command: webserver
+    image: my_airflow_image:latest
