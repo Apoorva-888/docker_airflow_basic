@@ -1,27 +1,41 @@
-version: '3'
+version: '3.9'  # Adjust if required
 
 services:
-  my_airflow_service:
-    build:
-      context: .
-    container_name: my_airflow_container
-    ports:
-      - "8080:8080"
+  postgres:
+    image: postgres:15
     environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
     volumes:
-      - ./dags:/opt/airflow/dags
-    command: webserver
-    image: my_airflow_image:latest
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
 
-  check_dependencies:
-    build:
-      context: .
-    command: /bin/bash -c "airflow db check"
-    depends_on:
-      - my_airflow_service
-    environment:
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+  airflow-webserver:
+    image: apache/airflow:2.8.0
+    ports:
+      - 8080:8080
     volumes:
       - ./dags:/opt/airflow/dags
-    working_dir: /opt/airflow
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+
+  airflow-scheduler:
+    image: apache/airflow:2.8.0
+    depends_on:
+      - postgres
+      - airflow-webserver
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+
+volumes:
+  postgres-db-volume:
