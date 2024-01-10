@@ -13,3 +13,15 @@ services:
       - ./dags:/opt/airflow/dags
     command: webserver
     image: my_airflow_image:latest
+
+  check_dependencies:
+    build:
+      context: .
+    command: /bin/bash -c "airflow db check"
+    depends_on:
+      - my_airflow_service
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    volumes:
+      - ./dags:/opt/airflow/dags
+    working_dir: /opt/airflow
